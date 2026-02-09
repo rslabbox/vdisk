@@ -3,7 +3,7 @@ use clap::Parser;
 
 fn main() -> Result<()> {
     // Initialize logger, default info level, display file line number and time
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("warn"))
         .format(|buf, record| {
             use std::io::Write;
             let level_style = buf.default_level_style(record.level());
