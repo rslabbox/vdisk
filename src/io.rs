@@ -3,8 +3,8 @@ use std::{
     io::{self, Read, Seek, SeekFrom, Write},
 };
 
-use rsext4::error::{BlockDevError, BlockDevResult};
 use rsext4::BlockDevice;
+use rsext4::error::{BlockDevError, BlockDevResult};
 
 pub struct PartitionBlockDev {
     file: File,
@@ -138,7 +138,10 @@ impl PartitionIo {
         }
         let pos = pos as u64;
         if pos > self.len {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "seek out of range"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "seek out of range",
+            ));
         }
         Ok(pos)
     }

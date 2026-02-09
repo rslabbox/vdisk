@@ -151,7 +151,6 @@ pub trait Seek: IoBase {
     fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error>;
 }
 
-
 impl From<SeekFrom> for std::io::SeekFrom {
     fn from(from: SeekFrom) -> Self {
         match from {
@@ -161,7 +160,6 @@ impl From<SeekFrom> for std::io::SeekFrom {
         }
     }
 }
-
 
 impl From<std::io::SeekFrom> for SeekFrom {
     fn from(from: std::io::SeekFrom) -> Self {
@@ -181,7 +179,6 @@ pub struct StdIoWrapper<T> {
     inner: T,
 }
 
-
 impl<T> StdIoWrapper<T> {
     /// Creates a new `StdIoWrapper` instance that wraps the provided `inner` instance.
     pub fn new(inner: T) -> Self {
@@ -194,11 +191,9 @@ impl<T> StdIoWrapper<T> {
     }
 }
 
-
 impl<T> IoBase for StdIoWrapper<T> {
     type Error = std::io::Error;
 }
-
 
 impl<T: std::io::Read> Read for StdIoWrapper<T> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -209,7 +204,6 @@ impl<T: std::io::Read> Read for StdIoWrapper<T> {
         self.inner.read_exact(buf)
     }
 }
-
 
 impl<T: std::io::Write> Write for StdIoWrapper<T> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -225,13 +219,11 @@ impl<T: std::io::Write> Write for StdIoWrapper<T> {
     }
 }
 
-
 impl<T: std::io::Seek> Seek for StdIoWrapper<T> {
     fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
         self.inner.seek(pos.into())
     }
 }
-
 
 impl<T> From<T> for StdIoWrapper<T> {
     fn from(from: T) -> Self {

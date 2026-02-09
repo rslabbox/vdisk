@@ -17,11 +17,11 @@ mod rm;
 
 pub fn run(cli: VDiskCli) -> Result<()> {
     match cli.action {
-        DiskAction::Mkimg { size, overwrite } => {
+        DiskAction::Dd { size, overwrite } => {
             let size_bytes = parse_size(&size)?;
             mkimg::mkimg(&cli.disk, size_bytes, overwrite)
         }
-        DiskAction::Mkgpt { file, align, yes } => {
+        DiskAction::Gpt { file, align, yes } => {
             let align_bytes = parse_size(&align)?;
             mkgpt::mkgpt(&cli.disk, &file, align_bytes, yes)
         }
@@ -60,7 +60,11 @@ pub fn run(cli: VDiskCli) -> Result<()> {
             let target = resolve_partition_target(&cli.disk, cli.part.as_deref())?;
             mkdir::mkdir(&cli.disk, &target, &path, parents)
         }
-        DiskAction::Cat { path, bytes, offset } => {
+        DiskAction::Cat {
+            path,
+            bytes,
+            offset,
+        } => {
             let target = resolve_partition_target(&cli.disk, cli.part.as_deref())?;
             cat::cat(&cli.disk, &target, &path, bytes, offset)
         }

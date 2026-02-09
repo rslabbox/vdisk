@@ -2,14 +2,21 @@ use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[command(name = "vdisk", version, about = "Virtual Disk Image Tool", long_about = None)]
+#[command(
+    name = "vdisk",
+    version,
+    // short_version,
+    about = "Virtual Disk Image Tool",
+    long_about = None,
+    override_usage = "vdisk <PATH> [--part ID|NAME] <COMMAND>"
+)]
 pub struct VDiskCli {
     /// Target disk image path
-    #[arg(long, value_name = "PATH")]
+    #[arg(value_name = "PATH", index = 1)]
     pub disk: PathBuf,
 
     /// Partition selector: index or name
-    #[arg(long, value_name = "ID|NAME")]
+    #[arg(short, long, value_name = "ID|NAME")]
     pub part: Option<String>,
 
     #[command(subcommand)]
@@ -19,7 +26,7 @@ pub struct VDiskCli {
 #[derive(Subcommand, Debug)]
 pub enum DiskAction {
     /// Create a blank disk image
-    Mkimg {
+    Dd {
         /// Image size (bytes or with K/M/G suffix)
         #[arg(long, value_name = "SIZE")]
         size: String,
@@ -30,7 +37,7 @@ pub enum DiskAction {
     },
 
     /// Create GPT partition table using parameter.txt
-    Mkgpt {
+    Gpt {
         /// Parameter file path (e.g. parameter.txt)
         #[arg(short = 'f', long, value_name = "PATH")]
         file: PathBuf,

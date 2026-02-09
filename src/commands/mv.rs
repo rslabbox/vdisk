@@ -1,12 +1,12 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use std::path::Path;
 
+use super::super::fs::is_dir as fs_is_dir;
 use super::super::fs::mv as fs_mv;
 use super::super::types::{PartitionTarget, PathKind};
+use super::super::utils::normalize_image_path;
 use super::super::utils::{confirm_or_yes, host_path, path_kind, remove_host_path};
 use super::cp::cp;
-use super::super::fs::is_dir as fs_is_dir;
-use super::super::utils::normalize_image_path;
 
 pub fn mv(disk: &Path, target: &PartitionTarget, src: &str, dst: &str, force: bool) -> Result<()> {
     let overwrite = force;
@@ -55,7 +55,8 @@ fn resolve_image_to_image_dst(
 
     let src = src.trim_end_matches('/');
     let name = src
-        .rsplit('/').next()
+        .rsplit('/')
+        .next()
         .filter(|s| !s.is_empty())
         .ok_or_else(|| anyhow!("invalid image path"))?;
 

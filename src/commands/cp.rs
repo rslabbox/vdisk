@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -94,7 +94,8 @@ fn resolve_image_to_host_dst(image: &str, host: &Path) -> Result<PathBuf> {
 
     let image = image.trim_end_matches('/');
     let name = image
-        .rsplit('/').next()
+        .rsplit('/')
+        .next()
         .filter(|s| !s.is_empty())
         .ok_or_else(|| anyhow!("invalid image path"))?;
 
@@ -127,7 +128,8 @@ fn resolve_image_to_image_dst(
 
     let src = src.trim_end_matches('/');
     let name = src
-        .rsplit('/').next()
+        .rsplit('/')
+        .next()
         .filter(|s| !s.is_empty())
         .ok_or_else(|| anyhow!("invalid image path"))?;
 

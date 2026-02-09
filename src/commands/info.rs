@@ -33,10 +33,7 @@ pub fn info(disk: &Path, json: bool) -> Result<()> {
     if partitions.is_empty() {
         println!("No GPT partitions found.");
         let fs_type = detect_fs_type(disk)?;
-        println!(
-            "Filesystem: {}",
-            fs_type.as_deref().unwrap_or("unknown")
-        );
+        println!("Filesystem: {}", fs_type.as_deref().unwrap_or("unknown"));
         return Ok(());
     }
 

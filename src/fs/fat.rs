@@ -1,8 +1,8 @@
-use anyhow::{anyhow, bail, Result};
-use crate::fatfs::{self,
-    FileSystem, FormatVolumeOptions, FsOptions, FatType, OemCpConverter, ReadWriteSeek, StdIoWrapper,
-    TimeProvider,
+use crate::fatfs::{
+    self, FatType, FileSystem, FormatVolumeOptions, FsOptions, OemCpConverter, ReadWriteSeek,
+    StdIoWrapper, TimeProvider,
 };
+use anyhow::{Result, anyhow, bail};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
@@ -53,11 +53,12 @@ pub fn with_fat<R>(
         target.offset_bytes,
         target.size_bytes,
     ));
-    let mut fs = FileSystem::new(io, FsOptions::new())
-        .map_err(|e| anyhow!("mount fat failed: {e}"))?;
+    let mut fs =
+        FileSystem::new(io, FsOptions::new()).map_err(|e| anyhow!("mount fat failed: {e}"))?;
 
     let result = f(FatOps { fs: &mut fs })?;
-    fs.unmount().map_err(|e| anyhow!("fat unmount failed: {e}"))?;
+    fs.unmount()
+        .map_err(|e| anyhow!("fat unmount failed: {e}"))?;
     Ok(result)
 }
 
@@ -67,7 +68,8 @@ impl FsOps for FatOps<'_> {
         let dir = if path == "/" || path.is_empty() {
             root
         } else {
-            root.open_dir(path).map_err(|e| anyhow!("open dir failed: {e}"))?
+            root.open_dir(path)
+                .map_err(|e| anyhow!("open dir failed: {e}"))?
         };
 
         let mut out = Vec::new();
@@ -98,7 +100,9 @@ impl FsOps for FatOps<'_> {
         let mut data = Vec::new();
         if let Some(n) = bytes {
             let mut buf = vec![0u8; n];
-            let read = file.read(&mut buf).map_err(|e| anyhow!("read failed: {e}"))?;
+            let read = file
+                .read(&mut buf)
+                .map_err(|e| anyhow!("read failed: {e}"))?;
             buf.truncate(read);
             data.extend_from_slice(&buf);
         } else {

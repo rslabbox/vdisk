@@ -19,3 +19,6 @@ serde_json = "1.0"
 rsext4 = { version = "0.1.0-pre.0", default-features = false } # Since version 0.1.0-pre.0 hasn't been released yet
 gpt = { version = "4.1.0", features = ["log"] }
 # fatfs = "0.4" // Since version 0.4 hasn't been released yet
+
+[dev-dependencies]
+tempfile = "3.12"

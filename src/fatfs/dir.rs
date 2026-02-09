@@ -547,7 +547,6 @@ impl<'a, IO: ReadWriteSeek, TP: TimeProvider, OCC: OemCpConverter> Dir<'a, IO, T
         raw_entry
     }
 
-    
     fn encode_lfn_utf16(name: &str) -> LfnBuffer {
         LfnBuffer::from_ucs2_units(name.encode_utf16())
     }
@@ -612,7 +611,7 @@ impl<'a, IO: ReadWriteSeek, TP: TimeProvider, OCC: OemCpConverter> Dir<'a, IO, T
         Ok(DirEntry {
             data: raw_entry,
             short_name,
-            
+
             lfn_utf16,
             fs: self.fs,
             entry_pos: start_abs_pos,
@@ -705,7 +704,7 @@ impl<'a, IO: ReadWriteSeek, TP: TimeProvider, OCC> DirIter<'a, IO, TP, OCC> {
                     return Ok(Some(DirEntry {
                         data,
                         short_name,
-                        
+
                         lfn_utf16: lfn_builder.into_buf(),
                         fs: self.fs,
                         entry_pos: abs_pos,
@@ -833,13 +832,11 @@ impl LfnBuffer {
     }
 }
 
-
 struct LongNameBuilder {
     buf: LfnBuffer,
     chksum: u8,
     index: u8,
 }
-
 
 impl LongNameBuilder {
     fn new() -> Self {
@@ -940,7 +937,6 @@ struct LfnEntriesGenerator<'a> {
     ended: bool,
 }
 
-
 impl<'a> LfnEntriesGenerator<'a> {
     fn new(name_utf16: &'a [u16], checksum: u8) -> Self {
         let num_entries = name_utf16.len().div_ceil(LFN_PART_LEN);
@@ -954,7 +950,6 @@ impl<'a> LfnEntriesGenerator<'a> {
         }
     }
 }
-
 
 impl Iterator for LfnEntriesGenerator<'_> {
     type Item = DirLfnEntryData;

@@ -12,18 +12,18 @@
 //!
 //! # Examples
 //!
-//! ```rust
-//! use std::io::prelude::*;
+//! ```rust,no_run
+//! use std::io::Write;
+//! use vdisk::fatfs::{FileSystem, FsOptions, StdIoWrapper};
 //!
-//! fn main() -> std::io::Result<()> {
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     # std::fs::copy("resources/fat16.img", "tmp/fat.img")?;
 //!     // Initialize a filesystem object
 //!     let img_file = std::fs::OpenOptions::new()
 //!         .read(true)
 //!         .write(true)
 //!         .open("tmp/fat.img")?;
-//!     let buf_stream = fscommon::BufStream::new(img_file);
-//!     let fs = fatfs::FileSystem::new(buf_stream, fatfs::FsOptions::new())?;
+//!     let fs = FileSystem::new(StdIoWrapper::new(img_file), FsOptions::new())?;
 //!     let root_dir = fs.root_dir();
 //!
 //!     // Write a file
@@ -34,8 +34,8 @@
 //!
 //!     // Read a directory
 //!     let dir = root_dir.open_dir("foo")?;
-//!     for r in dir.iter() {
-//!         let entry = r?;
+//!     for entry in dir.iter() {
+//!         let entry = entry?;
 //!         println!("{}", entry.file_name());
 //!     }
 //!     # std::fs::remove_file("tmp/fat.img")?;

@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use std::path::Path;
 
 pub fn mkimg(path: &Path, size_bytes: u64, overwrite: bool) -> Result<()> {
@@ -8,9 +8,8 @@ pub fn mkimg(path: &Path, size_bytes: u64, overwrite: bool) -> Result<()> {
     if let Some(parent) = path.parent()
         && !parent.as_os_str().is_empty()
     {
-        std::fs::create_dir_all(parent).with_context(|| {
-            format!("failed to create parent directory: {}", parent.display())
-        })?;
+        std::fs::create_dir_all(parent)
+            .with_context(|| format!("failed to create parent directory: {}", parent.display()))?;
     }
     let file = std::fs::OpenOptions::new()
         .create(true)

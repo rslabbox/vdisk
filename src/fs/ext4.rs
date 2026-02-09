@@ -1,11 +1,12 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use std::path::Path;
 
 use rsext4::{
+    BLOCK_SIZE, Ext4FileSystem, Jbd2Dev,
     entries::DirEntryIterator,
     file::{delete_dir, delete_file, read_file, rename, truncate, write_file},
     loopfile::{get_file_inode, resolve_inode_block_allextend},
-    mkfs, Ext4FileSystem, Jbd2Dev, BLOCK_SIZE,
+    mkfs,
 };
 // use rsext4::inode::Ext4Inode;
 use rsext4::disknode::Ext4Inode;
@@ -66,10 +67,13 @@ pub fn with_ext4<R>(
     let total_blocks = usable / block_size;
     let dev = PartitionBlockDev::new(file, target.offset_bytes, total_blocks, BLOCK_SIZE as u32);
     let mut jbd = Jbd2Dev::initial_jbd2dev(0, dev, false);
-    let mut fs = Ext4FileSystem::mount(&mut jbd)
-        .map_err(|e| anyhow!("mount ext4 failed: {e:?}"))?;
+    let mut fs =
+        Ext4FileSystem::mount(&mut jbd).map_err(|e| anyhow!("mount ext4 failed: {e:?}"))?;
 
-    let result = f(Ext4Ops { jbd: &mut jbd, fs: &mut fs })?;
+    let result = f(Ext4Ops {
+        jbd: &mut jbd,
+        fs: &mut fs,
+    })?;
 
     fs.umount(&mut jbd)
         .map_err(|e| anyhow!("umount failed: {e:?}"))?;
@@ -99,7 +103,7 @@ impl<'a> Ext4Ops<'a> {
                         continue;
                     }
                     if entry.inode == 0 {
-                          continue;
+                        continue;
                     }
                     let name = entry
                         .name_str()
@@ -121,49 +125,49 @@ impl<'a> Ext4Ops<'a> {
     }
 
     fn resolve_path(&mut self, path: &str) -> Result<Ext4Inode> {
-         if path == "/" {
-             let (_, root) = get_file_inode(self.fs, self.jbd, "/")
-                 .map_err(|e| anyhow!("root lookup failed: {e:?}"))?
-                 .ok_or_else(|| anyhow!("root not found"))?;
-             return Ok(root);
-         }
+        if path == "/" {
+            let (_, root) = get_file_inode(self.fs, self.jbd, "/")
+                .map_err(|e| anyhow!("root lookup failed: {e:?}"))?
+                .ok_or_else(|| anyhow!("root not found"))?;
+            return Ok(root);
+        }
 
-         let mut current_inode = {
-             let (_, root) = get_file_inode(self.fs, self.jbd, "/")
-                 .map_err(|e| anyhow!("root lookup failed: {e:?}"))?
-                 .ok_or_else(|| anyhow!("root not found"))?;
-             root
-         };
+        let mut current_inode = {
+            let (_, root) = get_file_inode(self.fs, self.jbd, "/")
+                .map_err(|e| anyhow!("root lookup failed: {e:?}"))?
+                .ok_or_else(|| anyhow!("root not found"))?;
+            root
+        };
 
-         let normalized = normalize_image_path(path);
-         let parts: Vec<&str> = normalized.split('/').filter(|s| !s.is_empty()).collect();
+        let normalized = normalize_image_path(path);
+        let parts: Vec<&str> = normalized.split('/').filter(|s| !s.is_empty()).collect();
 
-         for part in parts {
-             if !current_inode.is_dir() {
-                 bail!("not a directory");
-             }
-             
-             let entries = self.get_dir_entries(&mut current_inode)?;
-             let mut found_inode_num = None;
-             
-             for (inum, name, _) in entries {
-                 if name == part {
-                     found_inode_num = Some(inum);
-                     break;
-                 }
-             }
-             
-             match found_inode_num {
-                 Some(num) => {
-                     current_inode = self
-                    .fs
-                    .get_inode_by_num(self.jbd, num)
-                    .map_err(|e| anyhow!("inode read failed: {e:?}"))?;
-                 }
-                 None => bail!("path not found: {}", path),
-             }
-         }
-         Ok(current_inode)
+        for part in parts {
+            if !current_inode.is_dir() {
+                bail!("not a directory");
+            }
+
+            let entries = self.get_dir_entries(&mut current_inode)?;
+            let mut found_inode_num = None;
+
+            for (inum, name, _) in entries {
+                if name == part {
+                    found_inode_num = Some(inum);
+                    break;
+                }
+            }
+
+            match found_inode_num {
+                Some(num) => {
+                    current_inode = self
+                        .fs
+                        .get_inode_by_num(self.jbd, num)
+                        .map_err(|e| anyhow!("inode read failed: {e:?}"))?;
+                }
+                None => bail!("path not found: {}", path),
+            }
+        }
+        Ok(current_inode)
     }
 }
 
@@ -187,7 +191,7 @@ impl FsOps for Ext4Ops<'_> {
     fn read_file(&mut self, path: &str, offset: u64, bytes: Option<usize>) -> Result<Vec<u8>> {
         // Verify file existence via manual resolution first
         let _ = self.resolve_path(path)?;
-        
+
         let data = read_file(self.jbd, self.fs, path)
             .map_err(|e| anyhow!("read failed: {e:?}"))?
             .ok_or_else(|| anyhow!("file not found (read)"))?;
@@ -205,7 +209,7 @@ impl FsOps for Ext4Ops<'_> {
             Ok(_) => true,
             Err(_) => false, // Assume not found if resolve failed
         };
-        
+
         if exists {
             if !force {
                 bail!("destination exists, use -f to overwrite");
@@ -215,8 +219,7 @@ impl FsOps for Ext4Ops<'_> {
             rsext4::mkfile(self.jbd, self.fs, path, None, None)
                 .ok_or_else(|| anyhow!("mkfile failed for path: {}", path))?;
         }
-        write_file(self.jbd, self.fs, path, 0, data)
-            .map_err(|e| anyhow!("write failed: {e:?}"))?;
+        write_file(self.jbd, self.fs, path, 0, data).map_err(|e| anyhow!("write failed: {e:?}"))?;
         Ok(())
     }
 
@@ -245,9 +248,7 @@ impl FsOps for Ext4Ops<'_> {
     }
 
     fn mv(&mut self, src: &str, dst: &str, force: bool) -> Result<()> {
-        if !force
-            && self.resolve_path(dst).is_ok()
-        {
+        if !force && self.resolve_path(dst).is_ok() {
             bail!("destination exists, use -f to overwrite");
         }
         rename(self.jbd, self.fs, src, dst).map_err(|e| anyhow!("rename failed: {e:?}"))?;

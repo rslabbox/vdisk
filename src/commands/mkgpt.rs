@@ -1,5 +1,5 @@
-use anyhow::{anyhow, bail, Result};
-use gpt::{disk::LogicalBlockSize, partition_types, GptConfig};
+use anyhow::{Result, anyhow, bail};
+use gpt::{GptConfig, disk::LogicalBlockSize, partition_types};
 use std::path::Path;
 
 use super::super::gpt::{
@@ -17,10 +17,7 @@ pub fn mkgpt(disk: &Path, param_file: &Path, align_bytes: u64, yes: bool) -> Res
     }
 
     if !yes {
-        let prompt = format!(
-            "This will overwrite GPT on {}. Continue?",
-            disk.display()
-        );
+        let prompt = format!("This will overwrite GPT on {}. Continue?", disk.display());
         confirm_or_yes(false, &prompt)?;
     }
 

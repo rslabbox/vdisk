@@ -1,5 +1,5 @@
-use anyhow::{anyhow, Result};
-use gpt::{disk::LogicalBlockSize, GptConfig};
+use anyhow::{Result, anyhow};
+use gpt::{GptConfig, disk::LogicalBlockSize};
 use std::{fs::File, path::Path};
 
 use super::types::{PartitionInfo, PartitionSpec, PartitionTarget};

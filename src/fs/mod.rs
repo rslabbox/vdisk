@@ -1,6 +1,9 @@
 use anyhow::{Result, anyhow, bail};
 use std::path::Path;
-use std::{fs::OpenOptions, io::{Read, Seek, SeekFrom}};
+use std::{
+    fs::OpenOptions,
+    io::{Read, Seek, SeekFrom},
+};
 
 mod ext4;
 mod fat;
@@ -36,9 +39,7 @@ pub fn with_fs<R>(
         Ok(result) => Ok(result),
         Err(ext4_err) => match fat::with_fat(disk, target, |mut ops| f(&mut ops)) {
             Ok(result) => Ok(result),
-            Err(fat_err) => Err(anyhow!(
-                "mount failed: ext4: {ext4_err}; fat: {fat_err}"
-            )),
+            Err(fat_err) => Err(anyhow!("mount failed: ext4: {ext4_err}; fat: {fat_err}")),
         },
     }
 }

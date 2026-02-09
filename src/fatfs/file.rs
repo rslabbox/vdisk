@@ -339,7 +339,6 @@ impl<IO: ReadWriteSeek, TP: TimeProvider, OCC> Read for File<'_, IO, TP, OCC> {
     }
 }
 
-
 impl<IO: ReadWriteSeek, TP: TimeProvider, OCC> std::io::Read for File<'_, IO, TP, OCC>
 where
     std::io::Error: From<Error<IO::Error>>,
@@ -503,7 +502,6 @@ impl<IO: ReadWriteSeek, TP, OCC> Seek for File<'_, IO, TP, OCC> {
         Ok(u64::from(self.offset))
     }
 }
-
 
 impl<IO: ReadWriteSeek, TP: TimeProvider, OCC> std::io::Seek for File<'_, IO, TP, OCC>
 where

@@ -529,7 +529,7 @@ impl DirEntryEditor {
 pub struct DirEntry<'a, IO: ReadWriteSeek, TP, OCC> {
     pub(super) data: DirFileEntryData,
     pub(super) short_name: ShortName,
-        pub(super) lfn_utf16: LfnBuffer,
+    pub(super) lfn_utf16: LfnBuffer,
     pub(super) entry_pos: u64,
     pub(super) offset_range: (u64, u64),
     pub(super) fs: &'a FileSystem<IO, TP, OCC>,
@@ -556,7 +556,7 @@ impl<'a, IO: ReadWriteSeek, TP, OCC: OemCpConverter> DirEntry<'a, IO, TP, OCC> {
     /// Returns long file name as u16 array slice.
     ///
     /// Characters are encoded in the UCS-2 encoding.
-        #[must_use]
+    #[must_use]
     pub fn long_file_name_as_ucs2_units(&self) -> Option<&[u16]> {
         if self.lfn_utf16.len() > 0 {
             Some(self.lfn_utf16.as_ucs2_units())
@@ -568,7 +568,7 @@ impl<'a, IO: ReadWriteSeek, TP, OCC: OemCpConverter> DirEntry<'a, IO, TP, OCC> {
     /// Returns long file name or if it doesn't exist fallbacks to short file name.
     #[must_use]
     pub fn file_name(&self) -> String {
-                {
+        {
             let lfn_opt = self.long_file_name_as_ucs2_units();
             if let Some(lfn) = lfn_opt {
                 return String::from_utf16_lossy(lfn);
@@ -670,7 +670,7 @@ impl<'a, IO: ReadWriteSeek, TP, OCC: OemCpConverter> DirEntry<'a, IO, TP, OCC> {
         &self.data.name
     }
 
-        fn eq_name_lfn(&self, name: &str) -> bool {
+    fn eq_name_lfn(&self, name: &str) -> bool {
         if let Some(lfn) = self.long_file_name_as_ucs2_units() {
             let self_decode_iter = char::decode_utf16(lfn.iter().copied());
             let mut other_uppercase_iter = name.chars().flat_map(char_to_uppercase);

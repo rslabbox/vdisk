@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use dialoguer::Confirm;
 use std::path::{Path, PathBuf};
 
@@ -29,7 +29,8 @@ pub fn parse_u64_any(input: &str) -> Result<u64> {
     if let Some(hex) = s.strip_prefix("0x") {
         u64::from_str_radix(hex, 16).map_err(|_| anyhow!("invalid hex: {input}"))
     } else {
-        s.parse::<u64>().map_err(|_| anyhow!("invalid number: {input}"))
+        s.parse::<u64>()
+            .map_err(|_| anyhow!("invalid number: {input}"))
     }
 }
 
