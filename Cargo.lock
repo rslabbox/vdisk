@@ -645,7 +645,7 @@ dependencies = [
 
 [[package]]
 name = "vdisk"
-version = "0.0.1-dev-260209"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "bitflags",
