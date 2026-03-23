@@ -9,6 +9,7 @@ mod utils;
 
 pub use cli::VDiskCli;
 pub use commands::run;
+pub use commands::{cat, cp, info, ls, mkdir, mkgpt, mkfs, mkimg, mv, rm};
 
 #[macro_use]
 extern crate log;

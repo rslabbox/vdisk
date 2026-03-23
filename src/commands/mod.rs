@@ -10,10 +10,21 @@ mod info;
 mod ls;
 mod mkdir;
 mod mkfs;
-pub mod mkgpt;
-pub mod mkimg;
+mod mkgpt;
+mod mkimg;
 mod mv;
 mod rm;
+
+pub use cat::cat;
+pub use cp::cp;
+pub use info::info;
+pub use ls::ls;
+pub use mkdir::mkdir;
+pub use mkfs::mkfs;
+pub use mkgpt::mkgpt;
+pub use mkimg::mkimg;
+pub use mv::mv;
+pub use rm::rm;
 
 pub fn run(cli: VDiskCli) -> Result<()> {
     match cli.action {

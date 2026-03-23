@@ -8,7 +8,8 @@ use std::path::PathBuf;
     // short_version,
     about = "Virtual Disk Image Tool",
     long_about = None,
-    override_usage = "vdisk <PATH> [--part ID|NAME] <COMMAND>"
+    override_usage = "vdisk <PATH> [--part ID|NAME] <COMMAND>",
+    after_help = "Copy path rule:\n  host path must start with host: , image path has no prefix\n\nExamples:\n  host -> image: vdisk disk.img cp host:./hello.txt /hello.txt\n  image -> host: vdisk disk.img cp /hello.txt host:./out/hello.txt\n  recursive dir: vdisk disk.img cp -r host:./assets /assets"
 )]
 pub struct VDiskCli {
     /// Target disk image path
@@ -74,6 +75,10 @@ pub enum DiskAction {
     },
 
     /// Copy files between host and image
+    ///
+    /// Examples:
+    ///   vdisk <IMAGE> cp host:/path/on/host /path/in/image
+    ///   vdisk <IMAGE> cp /path/in/image host:/path/on/host
     Cp {
         #[arg(value_name = "SRC")]
         src: String,
